@@ -24,22 +24,18 @@ let parseXML = async (responseText) => {
 
   let booksArr = xml.querySelectorAll("book");
 
-
   return booksArr;
 }
 
 //carga imagenes por el isbn
-let loadImage = async (isbn) => {
-
-  let imagesArray = await loadJson(); // arreglo de imagenes 
+let loadImage = (isbn, arrayJson) => {
 
   let imageUrl = "";  // Variable para almacenar la URL de la imagen
 
-  imagesArray.forEach((book) => {
-    let isbn_actual = book.querySelector("ISBN").textContent;
+  arrayJson.forEach((book) => {
 
-    if (isbn_actual === isbn) {
-      imageUrl = book.querySelector("Image-URL-M").textContent;
+    if (book.ISBN == isbn) {
+      imageUrl = book["Image-URL-M"];
     }
   });
 
@@ -48,6 +44,8 @@ let loadImage = async (isbn) => {
 
 //combina info con imagenes de los libros
 let loadBooks = async () => {
+
+  let imagesArray = await loadJson(); // arreglo de imagenes 
 
   let URL_XML = 'https://raw.githubusercontent.com/DAWMFIEC/DAWM-apps/datos/bookstore-books.xml';
 
@@ -65,8 +63,10 @@ let loadBooks = async () => {
     let book_author = book.querySelector("Book-Author").textContent;
     let year_publication = book.querySelector("Year-Of-Publication").textContent;
     let book_title = book.querySelector("Book-Title").textContent;
-    let url_image = loadImage(book.querySelector("ISBN").textContent);
+    let url_image = loadImage(book.querySelector("ISBN").textContent, imagesArray);
 
+    console.log(book.querySelector("ISBN").textContent);
+    console.log(url_image);
 
     let template = `
     <div class="col-lg-2 mb-2 text-center">
