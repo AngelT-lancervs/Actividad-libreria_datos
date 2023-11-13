@@ -7,7 +7,6 @@ let loadJson = async () => {
     let responseObject = await fetch(URL_JSON);
     let responseJSON = await responseObject.json();
 
-    console.log(responseJSON);
     return responseJSON;    
 
 }
@@ -19,8 +18,6 @@ let parseXML = async (responseText) => {
   // Parsing XML
   const parser = new DOMParser();
   const xml = parser.parseFromString(responseText, "application/xml");
-
-  console.log(xml)
 
   let booksArr = xml.querySelectorAll("book");
 
@@ -55,7 +52,7 @@ let loadBooks = async () => {
   let infoArray = await parseXML(responseText); //arreglo de libros con info
 
   //Cargo la información del XML
-  let postsElement = document.querySelector("#library");
+  let postsElement = document.querySelector("#posts .row");
   postsElement.innerHTML = '';
 
   infoArray.forEach( (book) => {
@@ -93,4 +90,29 @@ let loadBooks = async () => {
 }
 
 loadBooks();
+
+
+
+let button = document.querySelector(".btn")
+
+  button.addEventListener("click", () => {
+
+    let text = document.querySelector("#newsletter1");
+    text = text.value;
+
+    let arrayBooks = document.querySelectorAll(".card-image")
+
+    if(text == ''){
+      alert("Escriba algo antes de buscar.")
+    }
+
+
+    arrayBooks.forEach( (book) => {
+
+      console.log("xdd")
+
+    }); 
+  
+  
+  });
 
