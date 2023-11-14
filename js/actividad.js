@@ -1,3 +1,4 @@
+
 let loadJson = async () => {
   let URL_JSON =
     "https://raw.githubusercontent.com/DAWMFIEC/DAWM-apps/datos/bookstore-images.json";
@@ -6,6 +7,7 @@ let loadJson = async () => {
   let responseJSON = await responseObject.json();
 
   return responseJSON;
+
 };
 
 //Cargar archivo XML
@@ -20,10 +22,10 @@ let parseXML = async (responseText) => {
 };
 
 //carga imagenes por el isbn
-let loadImage = (isbn, arrayJson) => {
+let loadImage = (isbn, arr) => {
   let imageUrl = ""; // Variable para almacenar la URL de la imagen
 
-  arrayJson.forEach((book) => {
+  arr.forEach((book) => {
     if (book.ISBN == isbn) {
       imageUrl = book["Image-URL-M"];
       return imageUrl;
@@ -35,7 +37,7 @@ let loadImage = (isbn, arrayJson) => {
 
 //combina info con imagenes de los libros
 let loadBooks = async () => {
-  let imagesArray = await loadJson(); // arreglo de imagenes
+  let imgArr = await loadJson();
 
   let URL_XML =
     "https://raw.githubusercontent.com/DAWMFIEC/DAWM-apps/datos/bookstore-books.xml";
@@ -43,44 +45,39 @@ let loadBooks = async () => {
   let responseObject = await fetch(URL_XML);
   let responseText = await responseObject.text();
 
-  let infoArray = await parseXML(responseText); //arreglo de libros con info
+  let infoArray = await parseXML(responseText);
 
-  //Cargo la información del XML
   let postsElement = document.querySelector("#posts .row");
+
+  // Limpia el contenido actual
   postsElement.innerHTML = "";
 
   infoArray.forEach((book) => {
     let book_author = book.querySelector("Book-Author").textContent;
-    let year_publication = book.querySelector(
-      "Year-Of-Publication"
-    ).textContent;
+    let year_publication = book.querySelector("Year-Of-Publication").textContent;
     let book_title = book.querySelector("Book-Title").textContent;
-    let url_image = loadImage(
-      book.querySelector("ISBN").textContent,
-      imagesArray
-    );
-
-    console.log(book.querySelector("ISBN").textContent);
-    console.log(url_image);
+    let url_image = loadImage(book.querySelector("ISBN").textContent, imgArr);
 
     let template = `
-    <div class="col-lg-2 mb-2 text-center">
-    <div class="card border-0 rounded-0">
-      <div class="card-image">
-        <img src="${url_image}" alt="blog-img" class="img-fluid">
+    <div class="book col-lg-2 mb-2 text-center">
+      <div class="card border-0 rounded-0">
+        <div class="card-image">
+          <img src="${url_image}" alt="blog-img" class="img-fluid">
+        </div>
       </div>
-    </div>
-    <div class="card-body text-capitalize">
-      <div class="card-meta fs-6">
-        <span class="meta-date">${book_author}</span>
-        <span class="meta-category">/ <a href="blog.html">${year_publication}</a></span>
+      <div class="card-body text-capitalize">
+        <div class="card-meta fs-6">
+          <span class="meta-date">${book_author}</span>
+          <span class="meta-category">/ <a href="blog.html">${year_publication}</a></span>
+        </div>
+        <h4 class="card-title">
+          <a href="buy.html">${book_title}</a>
+        </h4>
       </div>
-      <h4 class="card-title">
-        <a href="buy.html">${book_title}</a>
-      </h4>
-    </div>
     </div>
     `;
+
+    // Agrega el nuevo libro al contenido existente
     postsElement.innerHTML += template;
   });
 };
@@ -89,64 +86,33 @@ loadBooks();
 
 let button = document.querySelector(".btn");
 
-button.addEventListener("click", () => {
+button.addEventListener("click", async () => {
+
   let text = document.querySelector("#newsletter1");
   text = text.value.toUpperCase();
 
-  let arrayBooks = document.querySelectorAll(".col-lg-2.mb-2.text-center");
+  let arrayBooks = document.querySelectorAll(".book");
 
   if (text == "") {
-    document.querySelector("#posts .row").innerHTML = "";
-    alert("Escriba algo antes de buscar.");
-    loadBooks();
+    arrayBooks.forEach((book) => {
+      book.classList.remove('invisible');
+    });
     return;
   }
 
   arrayBooks.forEach((book) => {
-    let cont = 0;
 
-    let book_author = book
-      .querySelector(".meta-date")
-      .textContent.toUpperCase()
-      .includes(text);
-    let year_publication =
-      book
-        .querySelector(".meta-category")
-        .querySelector("a")
-        .textContent.toUpperCase() == text.toString();
-    let book_title = book
-      .querySelector(".card-title")
-      .querySelector("a")
-      .textContent.toUpperCase()
-      .includes(text);
+    let author = book.querySelector(".meta-date").textContent.toUpperCase().includes(text);
+    let year = book.querySelector(".meta-category").querySelector("a").textContent.toUpperCase() == text.toString();
+    let title = book.querySelector(".card-title").querySelector("a").textContent.toUpperCase().includes(text);
 
-    if (book_author || book_title || year_publication) {
-      console.log("micara");
+    if (!author && !title && !year) {
+      //console.log("micara");
+      book.classList.add('invisible');
+      
 
-      if (cont == 1) {
-        document.querySelector("#posts .row").innerHTML = "";
+    }else{
+        book.classList.remove('invisible');
       }
-
-      let template = `
-    <div class="col-lg-2 mb-2 text-center">
-    <div class="card border-0 rounded-0">
-      <div class="card-image">
-        <img src="${url_image}" alt="blog-img" class="img-fluid">
-      </div>
-    </div>
-    <div class="card-body text-capitalize">
-      <div class="card-meta fs-6">
-        <span class="meta-date">${book_author}</span>
-        <span class="meta-category">/ <a href="blog.html">${year_publication}</a></span>
-      </div>
-      <h4 class="card-title">
-        <a href="buy.html">${book_title}</a>
-      </h4>
-    </div>
-    </div>
-    `;
-
-      cont == 0 ? cont++ : (cont = 1);
-    }
   });
 });
