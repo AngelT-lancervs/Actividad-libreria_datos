@@ -57,6 +57,7 @@ let loadBooks = async () => {
     let year_publication = book.querySelector("Year-Of-Publication").textContent;
     let book_title = book.querySelector("Book-Title").textContent;
     let url_image = loadImage(book.querySelector("ISBN").textContent, imgArr);
+    let publisher = book.querySelector("Publisher").textContent;
 
     let template = `
     <div class="book col-lg-2 mb-2 text-center">
@@ -69,6 +70,7 @@ let loadBooks = async () => {
         <div class="card-meta fs-6">
           <span class="meta-date">${book_author}</span>
           <span class="meta-category">/ <a href="blog.html">${year_publication}</a></span>
+          <span class="meta-date publisher invisible"> ${publisher} </span>
         </div>
         <h4 class="card-title">
           <a href="buy.html">${book_title}</a>
@@ -105,8 +107,10 @@ button.addEventListener("click", async () => {
     let author = book.querySelector(".meta-date").textContent.toUpperCase().includes(text);
     let year = book.querySelector(".meta-category").querySelector("a").textContent.toUpperCase() == text.toString();
     let title = book.querySelector(".card-title").querySelector("a").textContent.toUpperCase().includes(text);
+    let publisher = book.querySelector(".publisher").textContent.toUpperCase().includes(text);
 
-    if (!author && !title && !year) {
+
+    if (!author && !title && !year && !publisher) {
       //console.log("micara");
       book.classList.add('invisible');
       
